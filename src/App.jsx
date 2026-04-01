@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Menu, X, CheckCircle, Clock, Circle, User,
   Calendar, MessageSquare, MoreVertical,
   LayoutDashboard, CheckSquare, Users, Settings,
-  ChevronRight, Plus
+  ChevronRight, Plus, GripVertical
 } from 'lucide-react';
 
 const mockTasks = [
@@ -21,11 +21,47 @@ const NavItem = ({ icon: Icon, label, active }) => (
   </button>
 );
 
+const MIN_DETAIL_WIDTH = 320;
+const MAX_DETAIL_WIDTH = 700;
+const DEFAULT_DETAIL_WIDTH = 480;
+
 export default function App() {
   const [tasks, setTasks] = useState(mockTasks);
   const [selectedTask, setSelectedTask] = useState(mockTasks[2]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [detailWidth, setDetailWidth] = useState(DEFAULT_DETAIL_WIDTH);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
+
+  const handleMouseDown = useCallback((e) => {
+    isDragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = detailWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [detailWidth]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging.current) return;
+      const delta = startX.current - e.clientX;
+      const newWidth = Math.min(MAX_DETAIL_WIDTH, Math.max(MIN_DETAIL_WIDTH, startWidth.current + delta));
+      setDetailWidth(newWidth);
+    };
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
@@ -73,9 +109,9 @@ export default function App() {
           <div className="p-3 border-t border-gray-100"><NavItem icon={Settings} label="設定" /></div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto bg-[#f8fafc] relative">
-          <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 pb-24">
-            <div className="mb-8 flex items-end justify-between">
+        <main className="flex-1 min-w-0 overflow-y-auto bg-[#f8fafc] relative">
+          <div className="mx-auto p-4 sm:p-6 pb-24">
+            <div className="mb-6 flex items-end justify-between">
               <div>
                 <div className="flex items-center text-sm text-gray-500 mb-2">
                   <span>Projects</span><ChevronRight className="w-4 h-4 mx-1" /><span className="font-medium text-indigo-600">新製品ローンチ</span>
@@ -88,7 +124,7 @@ export default function App() {
             <div className="py-2 relative">
               {tasks.map((task, index) => (
                 <div key={task.id} className="flex flex-col items-center w-full group/chain">
-                  <div onClick={() => handleTaskClick(task)} className={`w-full max-w-lg bg-white rounded-2xl p-4 sm:p-5 cursor-pointer transition-all duration-200 flex items-center justify-between ${selectedTask?.id === task.id ? 'border-2 border-indigo-500 shadow-md ring-4 ring-indigo-50/50 scale-[1.02]' : 'border border-gray-200 shadow-sm hover:border-indigo-300 hover:shadow-md'}`}>
+                  <div onClick={() => handleTaskClick(task)} className={`w-full max-w-xl bg-white rounded-2xl p-4 sm:p-5 cursor-pointer transition-all duration-200 flex items-center justify-between ${selectedTask?.id === task.id ? 'border-2 border-indigo-500 shadow-md ring-4 ring-indigo-50/50 scale-[1.02]' : 'border border-gray-200 shadow-sm hover:border-indigo-300 hover:shadow-md'}`}>
                     <div className="flex-1 pr-4">
                       <div className="flex items-center space-x-2 mb-2">
                         <span className={`flex items-center text-[11px] sm:text-xs font-bold px-2 py-1 rounded-md ${task.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : task.status === 'in-progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
@@ -124,7 +160,19 @@ export default function App() {
         </main>
 
         {isDetailOpen && <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-30 lg:hidden transition-opacity" onClick={() => setIsDetailOpen(false)}></div>}
-        <aside className={`fixed inset-y-0 right-0 z-40 w-full sm:w-[420px] bg-white border-l border-gray-200 transform transition-transform duration-300 ease-in-out flex flex-col lg:translate-x-0 lg:static lg:w-80 xl:w-96 shadow-2xl lg:shadow-none ${isDetailOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+
+        {/* ドラッグハンドル（デスクトップのみ） */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="hidden lg:flex items-center justify-center w-2 cursor-col-resize bg-gray-100 hover:bg-indigo-200 active:bg-indigo-300 transition-colors shrink-0 group"
+        >
+          <GripVertical className="w-3 h-3 text-gray-400 group-hover:text-indigo-500" />
+        </div>
+
+        <aside
+          style={{ width: typeof window !== 'undefined' && window.innerWidth >= 1024 ? detailWidth : undefined }}
+          className={`fixed inset-y-0 right-0 z-40 w-full sm:w-[420px] bg-white border-l border-gray-200 transform transition-transform duration-300 ease-in-out flex flex-col lg:translate-x-0 lg:static shadow-2xl lg:shadow-none shrink-0 ${isDetailOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
           {selectedTask ? (
             <>
               <div className="flex items-center justify-between p-4 border-b border-gray-100 shrink-0 bg-white">

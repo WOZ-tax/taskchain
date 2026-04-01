@@ -7,11 +7,11 @@ import {
 } from 'lucide-react';
 
 const mockTasks = [
-  { id: 1, title: '要件定義とスコープ設定', status: 'completed', assignee: 'Alice', date: '4月1日', description: 'クライアントとのキックオフMTGの内容をもとに、プロジェクトの要件とスコープを明確にし、ドキュメントにまとめる。' },
-  { id: 2, title: 'UIワイヤーフレーム作成', status: 'completed', assignee: 'Bob', date: '4月5日', description: 'Figmaを使用して、主要な3画面（ダッシュボード、タスク一覧、設定）のワイヤーフレームを作成する。' },
-  { id: 3, title: 'フロントエンド実装', status: 'in-progress', assignee: 'Charlie', date: '4月12日', description: 'ReactとTailwind CSSを用いて、ワイヤーフレームをもとにフロントエンドのコーディングを行う。' },
-  { id: 4, title: 'バックエンドAPI開発', status: 'todo', assignee: 'Dave', date: '4月15日', description: 'Node.js/Expressを使用して、タスクのCRUD操作を行うためのREST APIエンドポイントを構築する。' },
-  { id: 5, title: '結合テストとデプロイ', status: 'todo', assignee: 'Eve', date: '4月20日', description: 'フロントエンドとバックエンドを結合し、E2Eテストを実施後、本番環境へデプロイする。' },
+  { id: 1, title: '月次記帳・仕訳入力', status: 'completed', assignee: '田中', date: '4月5日', description: '3月分の請求書・領収書・通帳データをもとに会計ソフトへ仕訳入力を行う。売掛金・買掛金の消込、経費精算の確認も含む。' },
+  { id: 2, title: '給与計算・勤怠締め', status: 'completed', assignee: '佐藤', date: '4月10日', description: '3月分の勤怠データを締め、残業・有給・欠勤を集計。社会保険料・源泉所得税を計算し、給与明細を作成する。' },
+  { id: 3, title: '社会保険・労務手続き', status: 'in-progress', assignee: '鈴木', date: '4月15日', description: '入退社に伴う社会保険・雇用保険の資格取得届・喪失届の提出。36協定の更新確認、労災報告書の作成。' },
+  { id: 4, title: '請求書発行・入金消込', status: 'todo', assignee: '高橋', date: '4月20日', description: '4月分の請求書を発行し、クライアントへ送付。3月分の入金状況を確認し、売掛金の消込と未入金のフォローアップを行う。' },
+  { id: 5, title: '月次レポート・経営報告', status: 'todo', assignee: '渡辺', date: '4月25日', description: '試算表・資金繰り表を作成し、前月比・予算比の分析を行う。経営会議用の月次レポートをまとめ、クライアントへ報告する。' },
 ];
 
 const NavItem = ({ icon: Icon, label, active }) => (
@@ -101,9 +101,9 @@ export default function App() {
             <NavItem icon={Users} label="チームメンバー" />
             <div className="pt-6 mt-2">
               <p className="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">Projects<Plus className="w-4 h-4 cursor-pointer hover:text-indigo-500" /></p>
-              <NavItem icon={Circle} label="新製品ローンチ" active={true} />
-              <NavItem icon={Circle} label="ウェブサイトリニューアル" />
-              <NavItem icon={Circle} label="Q3 マーケティング" />
+              <NavItem icon={Circle} label="A社 月次BPO" active={true} />
+              <NavItem icon={Circle} label="B社 経理代行" />
+              <NavItem icon={Circle} label="C社 労務アウトソース" />
             </div>
           </nav>
           <div className="p-3 border-t border-gray-100"><NavItem icon={Settings} label="設定" /></div>
@@ -114,7 +114,7 @@ export default function App() {
             <div className="mb-6 flex items-end justify-between">
               <div>
                 <div className="flex items-center text-sm text-gray-500 mb-2">
-                  <span>Projects</span><ChevronRight className="w-4 h-4 mx-1" /><span className="font-medium text-indigo-600">新製品ローンチ</span>
+                  <span>Projects</span><ChevronRight className="w-4 h-4 mx-1" /><span className="font-medium text-indigo-600">A社 月次BPO</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">タスクチェーン</h1>
               </div>
